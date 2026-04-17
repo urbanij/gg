@@ -205,6 +205,7 @@ pub struct RevHeader {
     pub is_immutable: bool,
     pub refs: Vec<StoreRef>,
     pub parent_ids: Vec<CommitId>,
+    pub commit_date: String,
 }
 
 /// Configuration sent to the frontend when a workspace is opened.
@@ -391,4 +392,10 @@ fn format_timestamp(context: &Timestamp) -> Result<DateTime<FixedOffset>> {
         .ok_or(anyhow!("timezone offset out of bounds"))?;
 
     Ok(utc.with_timezone(&tz))
+}
+
+pub fn format_commit_date(timestamp: &Timestamp) -> Result<String> {
+    let dt = format_timestamp(timestamp)?;
+    // Format: "Mon, Feb 23, 5 PM" style
+    Ok(dt.format("%a, %b %-d, %-I %p").to_string())
 }

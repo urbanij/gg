@@ -20,6 +20,10 @@
 
     $: operand = (child ? { type: "Parent", header, child } : { type: "Revision", header }) as Operand;
 
+    $: hasBookmarks = header.refs.some(ref =>
+        ref.type !== "Tag" && (ref.type === "LocalBookmark" || !ref.is_synced || !ref.is_tracked)
+    );
+
     /*
      * Select this revision by default, or callback to a list that needs more complex behaviour.
      */
@@ -88,6 +92,9 @@
                         <WorkspaceObject name={header.working_copy_of} />
                     </div>
                 {/if}
+                {#if !hasBookmarks}
+                    <span class="date">{header.commit_date}</span>
+                {/if}
             </span>
         </div>
     {:else}
@@ -121,6 +128,9 @@
                         <div>
                             <WorkspaceObject name={header.working_copy_of} />
                         </div>
+                    {/if}
+                    {#if !hasBookmarks}
+                        <span class="date">{header.commit_date}</span>
                     {/if}
                 </span>
             </div>
@@ -185,6 +195,12 @@
 
     .text {
         pointer-events: none;
+    }
+
+    .date {
+        color: var(--ctp-subtext1);
+        font-size: 0.75em;
+        white-space: nowrap;
     }
 
     @media (width >= 1680px) {

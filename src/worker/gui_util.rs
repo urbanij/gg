@@ -820,6 +820,7 @@ impl WorkspaceSession<'_> {
                 .iter()
                 .map(|commit_id| self.format_commit_id(commit_id))
                 .collect(),
+            commit_date: crate::messages::format_commit_date(&commit.author().timestamp)?,
         })
     }
 

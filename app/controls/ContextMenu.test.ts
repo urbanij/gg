@@ -17,6 +17,7 @@ let mockHeader: RevHeader = {
     is_immutable: false,
     refs: [],
     parent_ids: [{ type: "CommitId", hex: "parent1", prefix: "par", rest: "ent1" }],
+    commit_date: "Mon, Jan 1, 12 AM",
 };
 
 describe("ContextMenu (revert)", () => {

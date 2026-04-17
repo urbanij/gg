@@ -42,6 +42,7 @@ function createMockRevs(): Extract<RevsResult, { type: "Detail" }> {
                 is_immutable: false,
                 refs: [],
                 parent_ids: [],
+                commit_date: "Mon, Jan 15, 12 PM",
             },
         ],
         parents: [],
