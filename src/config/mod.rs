@@ -37,6 +37,7 @@ pub trait GGSettings {
     fn ui_theme_override(&self) -> Option<String>;
     fn ui_mark_unpushed_bookmarks(&self) -> bool;
     fn ui_track_recent_workspaces(&self) -> bool;
+    fn ui_show_commit_dates(&self) -> bool;
     #[allow(dead_code)]
     fn ui_recent_workspaces(&self) -> Vec<String>;
     fn web_default_port(&self) -> u16;
@@ -74,6 +75,11 @@ impl GGSettings for UserSettings {
     fn ui_track_recent_workspaces(&self) -> bool {
         self.get_bool("gg.ui.track-recent-workspaces")
             .unwrap_or(true)
+    }
+
+    fn ui_show_commit_dates(&self) -> bool {
+        self.get_bool("gg.ui.show-commit-dates")
+            .unwrap_or(false)
     }
 
     fn ui_recent_workspaces(&self) -> Vec<String> {

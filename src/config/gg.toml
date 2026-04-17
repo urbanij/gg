@@ -22,6 +22,9 @@ track-recent-workspaces = true
 # When set, bookmarks that are local-only or remote-only will be visually indicated.
 mark-unpushed-bookmarks = true
 
+# When set, show the commit date for revisions without bookmarks in the log pane.
+show-commit-dates = false
+
 # "light" or "dark". If empty, your OS settings will be used.
 theme-override = ""
 

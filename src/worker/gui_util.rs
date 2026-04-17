@@ -707,6 +707,7 @@ impl WorkspaceSession<'_> {
             theme_override: self.data.workspace_settings.ui_theme_override(),
             mark_unpushed_bookmarks: self.data.workspace_settings.ui_mark_unpushed_bookmarks(),
             track_recent_workspaces: self.data.workspace_settings.ui_track_recent_workspaces(),
+            show_commit_dates: self.data.workspace_settings.ui_show_commit_dates(),
             ignore_immutable: self.session.ignore_immutable,
             has_external_diff_tool,
             has_external_merge_tool,
@@ -805,6 +806,12 @@ impl WorkspaceSession<'_> {
             .map(Result::Ok)
             .unwrap_or_else(|| self.check_immutable(vec![commit.id().clone()]))?;
 
+        let commit_date = if self.data.workspace_settings.ui_show_commit_dates() {
+            crate::messages::format_commit_date(&commit.author().timestamp)?
+        } else {
+            String::new()
+        };
+
         Ok(RevHeader {
             id: self.format_id(commit),
             description: commit.description().into(),
@@ -820,7 +827,7 @@ impl WorkspaceSession<'_> {
                 .iter()
                 .map(|commit_id| self.format_commit_id(commit_id))
                 .collect(),
-            commit_date: crate::messages::format_commit_date(&commit.author().timestamp)?,
+            commit_date,
         })
     }
 

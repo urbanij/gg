@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { RevHeader } from "../messages/RevHeader";
     import type { Operand } from "../messages/Operand";
-    import { ignoreToggled, currentTarget, revisionSelectEvent } from "../stores.js";
+    import { ignoreToggled, currentTarget, revisionSelectEvent, repoConfigEvent } from "../stores.js";
     import IdSpan from "../controls/IdSpan.svelte";
     import BookmarkObject from "./BookmarkObject.svelte";
     import Object from "./Object.svelte";
@@ -23,6 +23,8 @@
     $: hasBookmarks = header.refs.some(ref =>
         ref.type !== "Tag" && (ref.type === "LocalBookmark" || !ref.is_synced || !ref.is_tracked)
     );
+
+    $: shouldShowDate = $repoConfigEvent?.type === "Workspace" && $repoConfigEvent.show_commit_dates;
 
     /*
      * Select this revision by default, or callback to a list that needs more complex behaviour.
@@ -92,7 +94,7 @@
                         <WorkspaceObject name={header.working_copy_of} />
                     </div>
                 {/if}
-                {#if !hasBookmarks}
+                {#if !hasBookmarks && shouldShowDate}
                     <span class="date">{header.commit_date}</span>
                 {/if}
             </span>
@@ -129,7 +131,7 @@
                             <WorkspaceObject name={header.working_copy_of} />
                         </div>
                     {/if}
-                    {#if !hasBookmarks}
+                    {#if !hasBookmarks && shouldShowDate}
                         <span class="date">{header.commit_date}</span>
                     {/if}
                 </span>

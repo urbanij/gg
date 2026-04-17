@@ -224,6 +224,7 @@ pub enum RepoConfig {
         theme_override: Option<String>,
         mark_unpushed_bookmarks: bool,
         track_recent_workspaces: bool,
+        show_commit_dates: bool,
         ignore_immutable: bool,
         has_external_diff_tool: bool,
         has_external_merge_tool: bool,
