@@ -151,7 +151,7 @@ impl<'q, 'w> QuerySession<'q, 'w> {
         }
     }
 
-    pub fn get_page(&mut self) -> Result<LogPage> {
+    pub async fn get_page(&mut self) -> Result<LogPage> {
         let mut rows: Vec<LogRow> = Vec::with_capacity(self.state.page_size); // output rows to draw
         let mut row = self.state.next_row;
         let max = row + self.state.page_size;
@@ -211,7 +211,8 @@ impl<'q, 'w> QuerySession<'q, 'w> {
 
             let header = self
                 .ws
-                .format_header(&self.ws.get_commit(&commit_id)?, known_immutable)?;
+                .format_header(&self.ws.get_commit(&commit_id)?, known_immutable)
+                .await?;
 
             // remove empty stems on the right edge
             let empty_stems = self
@@ -321,18 +322,19 @@ impl<'q, 'w> QuerySession<'q, 'w> {
 }
 
 #[cfg(test)]
-pub fn query_log(ws: &WorkspaceSession, revset_str: &str, max_results: usize) -> Result<LogPage> {
+pub async fn query_log(ws: &WorkspaceSession<'_>, revset_str: &str, max_results: usize) -> Result<LogPage> {
     let state = QueryState::new(max_results);
     let revset = ws.evaluate_revset_str(revset_str)?;
     let mut session = QuerySession::new(ws, &*revset, state);
-    session.get_page()
+    session.get_page().await
 }
 
 #[cfg(test)]
-pub fn query_revision(ws: &WorkspaceSession<'_>, id: &RevId) -> Result<Option<RevHeader>> {
-    ws.resolve_optional_id(id)?
-        .map(|c| ws.format_header(&c, None))
-        .transpose()
+pub async fn query_revision(ws: &WorkspaceSession<'_>, id: &RevId) -> Result<Option<RevHeader>> {
+    match ws.resolve_optional_id(id)? {
+        Some(c) => Ok(Some(ws.format_header(&c, None).await?)),
+        None => Ok(None),
+    }
 }
 
 /// Read display details for a revset (limited to sequences). Returns headers in topological order (children first).
@@ -418,7 +420,7 @@ pub async fn query_revisions(ws: &WorkspaceSession<'_>, set: RevSet) -> Result<R
     let mut known_immutable: Option<bool> = None;
     for commit in &commits {
         // optimization: once we find an immutable revision, its ancestors must be immutable too
-        let header = ws.format_header(commit, known_immutable)?;
+        let header = ws.format_header(commit, known_immutable).await?;
         if known_immutable.is_none() && header.is_immutable {
             known_immutable = Some(true);
         }
@@ -426,12 +428,10 @@ pub async fn query_revisions(ws: &WorkspaceSession<'_>, set: RevSet) -> Result<R
     }
 
     // optimization: if anything was immutable, the oldest revision's parents must also be immutable
-    let parents = oldest_commit
-        .parents()
-        .await?
-        .iter()
-        .map(|p| ws.format_header(p, known_immutable))
-        .collect::<Result<Vec<_>, _>>()?;
+    let mut parents = Vec::new();
+    for p in &oldest_commit.parents().await? {
+        parents.push(ws.format_header(p, known_immutable).await?);
+    }
 
     Ok(RevsResult::Detail {
         set,

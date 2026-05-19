@@ -244,7 +244,7 @@ impl Mutation for CheckoutRevision {
             .await?
         {
             Some(new_status) => {
-                let new_selection = Some(ws.format_header(&edited, Some(false))?);
+                let new_selection = Some(ws.format_header(&edited, Some(false)).await?);
                 Ok(MutationResult::Updated {
                     new_status,
                     new_selection,
@@ -282,7 +282,7 @@ impl Mutation for CreateRevision {
 
         match ws.finish_transaction(tx, "new empty commit").await? {
             Some(new_status) => {
-                let new_selection = Some(ws.format_header(&new_commit, Some(false))?);
+                let new_selection = Some(ws.format_header(&new_commit, Some(false)).await?);
                 Ok(MutationResult::Updated {
                     new_status,
                     new_selection,
@@ -330,7 +330,7 @@ impl Mutation for CreateRevisionBetween {
 
         match ws.finish_transaction(tx, "new empty commit").await? {
             Some(new_status) => {
-                let new_selection = Some(ws.format_header(&new_commit, Some(false))?);
+                let new_selection = Some(ws.format_header(&new_commit, Some(false)).await?);
                 Ok(MutationResult::Updated {
                     new_status,
                     new_selection,
@@ -452,7 +452,7 @@ impl Mutation for DuplicateRevisions {
                         .get_index(0)
                         .ok_or(anyhow!("single source should have single copy"))?
                         .1;
-                    let new_selection = Some(ws.format_header(new_commit, None)?);
+                    let new_selection = Some(ws.format_header(new_commit, None).await?);
                     Ok(MutationResult::Updated {
                         new_status,
                         new_selection,

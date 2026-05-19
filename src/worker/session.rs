@@ -472,7 +472,7 @@ impl Session for QuerySession<'_, '_> {
                     tx,
                     tracking_bookmark,
                 }) => tx.send(queries::query_remotes(self.ws, tracking_bookmark))?,
-                Ok(SessionEvent::QueryLogNextPage { tx }) => tx.send(self.get_page())?,
+                Ok(SessionEvent::QueryLogNextPage { tx }) => tx.send(self.get_page().await)?,
                 Ok(unhandled) => return Ok(QueryResult(unhandled, self.state)),
                 Err(err) => return Err(anyhow!(err)),
             };
@@ -528,7 +528,7 @@ async fn handle_query(
     };
 
     let mut query = queries::QuerySession::new(ws, &*revset, query_state);
-    let page = query.get_page();
+    let page = query.get_page().await;
     tx.send(page)?;
 
     let QueryResult(next_event, next_query) = query.handle_events(rx).await.context("LogQuery")?;

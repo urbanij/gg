@@ -795,7 +795,7 @@ impl WorkspaceSession<'_> {
         }
     }
 
-    pub(crate) fn format_header(
+    pub(crate) async fn format_header(
         &self,
         commit: &Commit,
         known_immutable: Option<bool>,
@@ -807,7 +807,12 @@ impl WorkspaceSession<'_> {
             .map(Result::Ok)
             .unwrap_or_else(|| self.check_immutable(vec![commit.id().clone()]))?;
 
-        let is_empty = false; // TODO: compare tree IDs with parent when we can await
+        let is_empty = if commit.parent_ids().len() == 1 {
+            let parent = commit.parents().await?;
+            commit.tree_ids() == parent[0].tree_ids()
+        } else {
+            false
+        };
 
         Ok(RevHeader {
             id: self.format_id(commit),

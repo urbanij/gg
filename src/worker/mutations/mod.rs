@@ -620,7 +620,7 @@ impl Mutation for UndoOperation {
         {
             Some(new_status) => {
                 let working_copy = ws.get_commit(ws.wc_id())?;
-                let new_selection = Some(ws.format_header(&working_copy, None)?);
+                let new_selection = Some(ws.format_header(&working_copy, None).await?);
                 Ok(MutationResult::Updated {
                     new_status,
                     new_selection,
