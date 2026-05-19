@@ -807,6 +807,8 @@ impl WorkspaceSession<'_> {
             .map(Result::Ok)
             .unwrap_or_else(|| self.check_immutable(vec![commit.id().clone()]))?;
 
+        let is_empty = false; // TODO: compare tree IDs with parent when we can await
+
         Ok(RevHeader {
             id: self.format_id(commit),
             description: commit.description().into(),
@@ -816,6 +818,7 @@ impl WorkspaceSession<'_> {
             is_working_copy: *commit.id() == self.operation.wc_id
                 || self.workspace_index().contains_key(commit.id()),
             is_immutable,
+            is_empty,
             refs,
             parent_ids: commit
                 .parent_ids()

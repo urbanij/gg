@@ -203,6 +203,7 @@ pub struct RevHeader {
     pub is_working_copy: bool,
     pub working_copy_of: Option<String>,
     pub is_immutable: bool,
+    pub is_empty: bool,
     pub refs: Vec<StoreRef>,
     pub parent_ids: Vec<CommitId>,
 }

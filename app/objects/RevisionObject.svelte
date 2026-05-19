@@ -64,7 +64,7 @@
                         $currentTarget.header.parent_ids.findIndex((id) => id.hex == header.id.commit.hex) != -1)} />
 
             <span class="text desc truncate" class:indescribable={!context && header.description.lines[0] == ""}>
-                {dragHint ?? (header.description.lines[0] == "" ? "(no description set)" : header.description.lines[0])}
+                {dragHint ?? (header.description.lines[0] == "" ? `(no description set)${header.is_empty ? " (empty)" : ""}` : header.description.lines[0])}
             </span>
 
             <span class="email"><AuthorSpan author={header.author} /></span>
@@ -98,7 +98,7 @@
                 <span class="text desc truncate" class:indescribable={!context && header.description.lines[0] == ""}>
                     {dragHint ??
                         dropHint ??
-                        (header.description.lines[0] == "" ? "(no description set)" : header.description.lines[0])}
+                        (header.description.lines[0] == "" ? `(no description set)${header.is_empty ? " (empty)" : ""}` : header.description.lines[0])}
                 </span>
 
                 <span class="email"><AuthorSpan author={header.author} /></span>
